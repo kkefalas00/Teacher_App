@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Teachers</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+</head>
+<body>
+<div class="container-fluid text-center">
+
+    <div class="mt-4 p-5 bg-primary text-white rounded">
+        <div style="color:white"><h2>Manage teachers</h2></div>
+        <div style="color:white">
+            <a class="h2" th:href="@{/}" style="color:white">Return to Main</a>
+        </div>
+    </div>
+
+
+    <div th:if="${message}" class="alert alert-success text-center">
+        [[${message}]]
+    </div>
+    <div style="margin-top:20px;margin-bottom:20px;">
+        <div class=" row">
+            <div class="col-md-2">
+                <input id ="txtSearch" type ="text" name ="keyword" placeholder="Search">
+                <button id = "cleanTxt" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <table id = "teachersTable" class="table table-bordered">
+            <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>E-mail</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Enabled</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="teacher : ${listTeachers}">
+                <tr>
+                    <td>[[${teacher.id}]]</td>
+                    <td>[[${teacher.email}]]</td>
+                    <td>[[${teacher.firstName}]]</td>
+                    <td>[[${teacher.lastName}]]</td>
+                    <td>[[${teacher.enabled}]]</td>
+                    <td><a th:href="@{'/teachers/edit/' + ${teacher.id}}" class = "btn btn-warning">Edit</a></td>
+                    <td><a th:href="@{'/teachers/delete/' + ${teacher.id}}" id = "deleteButton" class = "btn btn-danger">Delete</a></td>
+                </tr>
+            </th:block>
+
+            </tbody>
+        </table>
+
+    </div>
+    <div class="m-2" style="color:white">
+        <a class="btn btn-success" th:href="@{/teachers/new}">Add New Teacher</a>
+    </div>
+</div>
+
+
+<div class="modal" tabindex="-1" id = "deleteModal">
+    <div class="modal-dialog" role=" document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm delete</h5>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this record?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href = ""  class="btn btn-primary" id = "delRef">Yes </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+ console.log("hey1")
+</script>
+
+<script th:inline="javascript">
+console.log("hey")
+    $(document).ready(function () {
+
+    var teachers = [[${listTeachers}]];
+
+    function setupEventHandlers() {
+        $('#teachersTable').on('click', '.btn-danger', function (event) {
+            event.preventDefault();
+            var href = $(this).attr('href');
+            $('#deleteModal #delRef').attr('href', href);
+            $('#deleteModal').modal();
+        });
+    }
+
+    function FilterFunction(value, data) {
+       var filteredData = [];
+        for(var i=0; i<data.length; i++){
+            value = value.toLowerCase();
+            var fName = data[i].firstName.toLowerCase();
+            var lName = data[i].lastName.toLowerCase();
+            var email = data[i].email.toLowerCase();
+
+            if(fName.includes(value) || lName.includes(value) || email.includes(value)){
+                filteredData.push(data[i]);
+            }
+        }
+        return filteredData;
+    }
+
+    function rebuildTable(data) {
+      var table = document.getElementById("teachersTable");
+    table.innerHTML = "";
+    table.innerHTML += `
+        <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>E-mail</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Enabled</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+    `;
+
+    for (var i = 0; i < data.length; i++) {
+        var row = `
+            <tr>
+                <td>${data[i].id}</td>
+                <td>${data[i].email}</td>
+                <td>${data[i].firstName}</td>
+                <td>${data[i].lastName}</td>
+                <td>${data[i].enabled}</td>
+                <td><a href="/teachers/edit/${data[i].id}" class="btn btn-warning">Edit</a></td>
+                <td><a href="/teachers/delete/${data[i].id}" class="btn btn-danger">Delete</a></td>
+            </tr>
+        `;
+        table.innerHTML += row;
+    }
+
+    // Call the event handler setup function to reattach event handlers.
+    setupEventHandlers();
+    }
+        setupEventHandlers();
+
+        $('#txtSearch').on('keyup', function () {
+            var value = $(this).val();
+            var data = FilterFunction(value, teachers);
+            rebuildTable(data);
+        });
+
+        $('#cleanTxt').on('click', function () {
+            $('#txtSearch').val("");
+            rebuildTable(teachers);
+        });
+    });
+</script>
+</body>
+</html>

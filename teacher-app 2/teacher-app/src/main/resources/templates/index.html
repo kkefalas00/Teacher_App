@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to My Application</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"  />
+</head>
+<body>
+<div class="container-fluid text-center">
+    <div class="mt-4 p-5 bg-primary text-white rounded">
+        <h1>Welcome to the Teachers Web App</h1>
+    </div>
+</div>
+<div style="text-align:center; margin-top:20px;">
+<a class="btn btn-secondary" th:href="@{/students}" style="color:white">List of students</a> &nbsp&nbsp
+<a class="btn btn-secondary" th:href="@{/teachers}" style="color:white">List of teachers</a>
+</div>
+</body>
+</html>
